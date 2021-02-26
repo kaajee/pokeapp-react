@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
-import styled from '@emotion/styled'
-import spinner from './loading.svg'
+import styled from '@emotion/styled';
+import pokeball from '../../assets/pokeball.svg';
+
+import '../../assets/styles/animation.css'
 
 const Sprite = styled.img`
   width: 5em;
@@ -12,6 +14,8 @@ const Sprite = styled.img`
 const Card = styled.div`
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border-color: #000000;
+  background-clip: padding-box;
   &:hover {
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
   }
@@ -19,6 +23,7 @@ const Card = styled.div`
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  
 `;
 
 const StyledLink = styled(Link)`
@@ -58,15 +63,15 @@ class PokemonCard extends Component {
 
     render() {
         return (
-            <div className="col-6 col-md-3 mb-5">
+            <div className="col col-md-3 mb-5">
                 <StyledLink to={`pokemon/${this.state.pokemonIndex}`}>
                     <Card className="card">
-                        <div className="card-header">
+                        <div className="card-header" style={{backgroundColor: "#E19720"}}>
                             <h5>{this.state.pokemonIndex}</h5>
                         </div>
                         {this.state.imageLoading ? (
-                            <img src={spinner} style={{width: '5em', height: '5em'}}
-                                 className='card-img-top rounded mx-auto d-block mt-2' alt="Loading" />
+                            <img src={pokeball} style={{width: '5em', height: '5em'}}
+                                 className='card-img-top rounded mx-auto d-block mt-2 ping' alt="Loading" />
                         ) : null}
                         <Sprite
                             className="card-img-top rounded mx-auto mt-2"

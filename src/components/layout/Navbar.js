@@ -13,7 +13,7 @@ class Navbar extends Component {
         return (
             <React.Fragment>
                 <nav className="navbar navbar-expand-md navbar-dark fixed-top">
-                    <a className="navbar-brand align-items-center" href="#">
+                    <a className="navbar-brand align-items-center" href="/">
                         <Logo src={BrangLogo} width="30" height="30" alt="Pokedex Mobile"/>
                         PokeApp
                     </a>

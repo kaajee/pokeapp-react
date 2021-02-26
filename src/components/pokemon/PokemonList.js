@@ -10,15 +10,12 @@ export default function PokemonList() {
     const [currentPageUrl, setCurrentPageUrl] = useState("https://pokeapi.co/api/v2/pokemon");
     const [nextPageUrl, setNextPageUrl] = useState();
     const [prevPageUrl, setPrevPageUrl] = useState();
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setLoading(true);
         let cancel
         axios.get(currentPageUrl, {
             cancelToken: new axios.CancelToken(c => cancel = c)
         }).then(res => {
-            setLoading(false);
             setNextPageUrl(res.data.next);
             setPrevPageUrl(res.data.previous);
             setPokemon(res.data.results);
@@ -35,15 +32,13 @@ export default function PokemonList() {
         setCurrentPageUrl(prevPageUrl)
     }
 
-    if (loading) return "Loading...";
-
     return (
         <React.Fragment>
             {pokemon ? (<div className="row">
-                {pokemon.map(pokemon => (
+                {pokemon.map(pokemon_data => (
                     <PokemonCard
-                        key={pokemon.name}
-                        pokemon={pokemon}/>
+                        key={pokemon_data.name}
+                        pokemon={pokemon_data}/>
                 ))}
             </div>) : (<Loading />)}
 

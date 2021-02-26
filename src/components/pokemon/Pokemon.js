@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
 import axios from "axios";
 
-import PokeApiLogo from './pokeapi_256.png';
-
 const TYPE_COLORS = {
     bug: 'B1C12E',
     dark: '4F3A2D',
@@ -53,7 +51,7 @@ class Pokemon extends Component {
     };
 
     async componentDidMount() {
-        const { pokemonIndex } = this.props.match.params;
+        const {pokemonIndex} = this.props.match.params;
 
         const pokemonUrl = `https://pokeapi.co/api/v2/pokemon/${pokemonIndex}/`;
         const pokemonSpeciesUrl = `https://pokeapi.co/api/v2/pokemon-species/${pokemonIndex}/`;
@@ -85,7 +83,11 @@ class Pokemon extends Component {
                 case 'special-defense':
                     specialDefense = stat['base_stat'];
                     break
+                default:
+                    break
             }
+
+            return true;
         })
 
         // Convert Decimeters to meters
@@ -95,6 +97,8 @@ class Pokemon extends Component {
         const weight = Math.round((pokemonRes.data.weight * 0.1 + 0.0001) * 100) / 100;
 
         const types = pokemonRes.data.types.map(type => type.type.name);
+
+        const themeColor = `${TYPE_COLORS[types[types.length - 1]]}`;
 
         const abilities = pokemonRes.data.abilities.map(ability => {
             return ability.ability.name
@@ -120,13 +124,14 @@ class Pokemon extends Component {
                 if (flavor.language.name === 'en') {
                     description = flavor.flavor_text;
                 }
+                return true;
             });
 
             const femaleRate = res.data.gender_rate;
             const genderRatioFemale = 12.5 * femaleRate;
             const genderRatioMale = 12.5 * (8 - femaleRate);
 
-            const catchRate = Math.round((100/255) * res.data.capture_rate);
+            const catchRate = Math.round((100 / 255) * res.data.capture_rate);
 
             const eggGroups = res.data.egg_groups.map(group => {
                 return group.name
@@ -146,6 +151,8 @@ class Pokemon extends Component {
                 eggGroups,
                 hatchSteps
             })
+
+            return true;
         });
 
 
@@ -162,6 +169,7 @@ class Pokemon extends Component {
                 specialAttack,
                 specialDefense
             },
+            themeColor,
             height,
             weight,
             abilities,
@@ -173,7 +181,7 @@ class Pokemon extends Component {
         return (
             <div className="col">
                 <div className="card">
-                    <div className="card-header">
+                    <div className="card-header" style={{backgroundColor: "#E19720"}}>
                         <div className="row">
                             <div className="col-5">
                                 <h5>{this.state.pokemonIndex}</h5>
@@ -183,7 +191,7 @@ class Pokemon extends Component {
                                     <span
                                         key={type}
                                         className="badge badge-pill badge-primary mr-1"
-                                        style={{backgroundColor: `#${TYPE_COLORS[type]}`, color: '#FFF'}}
+                                        style={{backgroundColor: `#${TYPE_COLORS[type]}`, color: "#000"}}
                                     >
                                         {type.toLowerCase()
                                             .split(' ')
@@ -211,8 +219,12 @@ class Pokemon extends Component {
                                     <div className="col-12 col-md-3">HP</div>
                                     <div className="col-12 col-md-9">
                                         <div className="progress">
-                                            <div className="progress-bar" role="progressbar" style={{width: `${this.state.stats.hp}%`}}
-                                                 aria-valuenow={this.state.stats.hp} aria-valuemin="0" aria-valuemax="100">
+                                            <div className="progress-bar" role="progressbar" style={{
+                                                width: `${this.state.stats.hp}%`,
+                                                backgroundColor: `#${this.state.themeColor}`, color: "#000"
+                                            }}
+                                                 aria-valuenow={this.state.stats.hp} aria-valuemin="0"
+                                                 aria-valuemax="100">
                                                 {this.state.stats.hp}
                                             </div>
                                         </div>
@@ -222,8 +234,12 @@ class Pokemon extends Component {
                                     <div className="col-12 col-md-3">Attack</div>
                                     <div className="col-12 col-md-9">
                                         <div className="progress">
-                                            <div className="progress-bar" role="progressbar" style={{width: `${this.state.stats.attack}%`}}
-                                                 aria-valuenow={this.state.stats.attack} aria-valuemin="0" aria-valuemax="100">
+                                            <div className="progress-bar" role="progressbar" style={{
+                                                width: `${this.state.stats.attack}%`,
+                                                backgroundColor: `#${this.state.themeColor}`, color: "#000"
+                                            }}
+                                                 aria-valuenow={this.state.stats.attack} aria-valuemin="0"
+                                                 aria-valuemax="100">
                                                 {this.state.stats.attack}
                                             </div>
                                         </div>
@@ -233,8 +249,12 @@ class Pokemon extends Component {
                                     <div className="col-12 col-md-3">Defense</div>
                                     <div className="col-12 col-md-9">
                                         <div className="progress">
-                                            <div className="progress-bar" role="progressbar" style={{width: `${this.state.stats.defense}%`}}
-                                                 aria-valuenow={this.state.stats.defense} aria-valuemin="0" aria-valuemax="100">
+                                            <div className="progress-bar" role="progressbar" style={{
+                                                width: `${this.state.stats.defense}%`,
+                                                backgroundColor: `#${this.state.themeColor}`, color: "#000"
+                                            }}
+                                                 aria-valuenow={this.state.stats.defense} aria-valuemin="0"
+                                                 aria-valuemax="100">
                                                 {this.state.stats.defense}
                                             </div>
                                         </div>
@@ -244,8 +264,12 @@ class Pokemon extends Component {
                                     <div className="col-12 col-md-3">Speed</div>
                                     <div className="col-12 col-md-9">
                                         <div className="progress">
-                                            <div className="progress-bar" role="progressbar" style={{width: `${this.state.stats.speed}%`}}
-                                                 aria-valuenow={this.state.stats.speed} aria-valuemin="0" aria-valuemax="100">
+                                            <div className="progress-bar" role="progressbar" style={{
+                                                width: `${this.state.stats.speed}%`,
+                                                backgroundColor: `#${this.state.themeColor}`, color: "#000"
+                                            }}
+                                                 aria-valuenow={this.state.stats.speed} aria-valuemin="0"
+                                                 aria-valuemax="100">
                                                 {this.state.stats.speed}
                                             </div>
                                         </div>
@@ -255,8 +279,12 @@ class Pokemon extends Component {
                                     <div className="col-12 col-md-3">Sp. Attack</div>
                                     <div className="col-12 col-md-9">
                                         <div className="progress">
-                                            <div className="progress-bar" role="progressbar" style={{width: `${this.state.stats.specialAttack}%`}}
-                                                 aria-valuenow={this.state.stats.specialAttack} aria-valuemin="0" aria-valuemax="100">
+                                            <div className="progress-bar" role="progressbar" style={{
+                                                width: `${this.state.stats.specialAttack}%`,
+                                                backgroundColor: `#${this.state.themeColor}`, color: "#000"
+                                            }}
+                                                 aria-valuenow={this.state.stats.specialAttack} aria-valuemin="0"
+                                                 aria-valuemax="100">
                                                 {this.state.stats.specialAttack}
                                             </div>
                                         </div>
@@ -266,8 +294,12 @@ class Pokemon extends Component {
                                     <div className="col-12 col-md-3">Sp. Defense</div>
                                     <div className="col-12 col-md-9">
                                         <div className="progress">
-                                            <div className="progress-bar" role="progressbar" style={{width: `${this.state.stats.specialDefense}%`}}
-                                                 aria-valuenow={this.state.stats.specialDefense} aria-valuemin="0" aria-valuemax="100">
+                                            <div className="progress-bar" role="progressbar" style={{
+                                                width: `${this.state.stats.specialDefense}%`,
+                                                backgroundColor: `#${this.state.themeColor}`, color: "#000"
+                                            }}
+                                                 aria-valuenow={this.state.stats.specialDefense} aria-valuemin="0"
+                                                 aria-valuemax="100">
                                                 {this.state.stats.specialDefense}
                                             </div>
                                         </div>
@@ -292,11 +324,13 @@ class Pokemon extends Component {
                                 </div>
                                 <div className="row">
                                     <div className="col-md-6"><h6 className="text-right">Weight: </h6></div>
-                                    <div className="col-md-6"><h6 className="text-left">{this.state.weight} kg</h6></div>
+                                    <div className="col-md-6"><h6 className="text-left">{this.state.weight} kg</h6>
+                                    </div>
                                 </div>
                                 <div className="row">
                                     <div className="col-md-6"><h6 className="text-right">Catch Rate: </h6></div>
-                                    <div className="col-md-6"><h6 className="text-left">{this.state.catchRate}%</h6></div>
+                                    <div className="col-md-6"><h6 className="text-left">{this.state.catchRate}%</h6>
+                                    </div>
                                 </div>
                                 <div className="row">
                                     <div className="col-md-6"><h6 className="text-right">Gender Ratio: </h6></div>
