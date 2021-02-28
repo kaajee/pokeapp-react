@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
+import { connect } from 'react-redux';
+
+import { mapDispatchToProps } from './actionCreators';
+import { mapStateToProps } from './selectors';
 import styled from '@emotion/styled';
 import pokeball from '../../assets/pokeball.svg';
-
 import '../../assets/styles/animation.css'
 
 const Sprite = styled.img`
@@ -46,28 +49,43 @@ class PokemonCard extends Component {
         imageUrl: '',
         pokemonIndex: '',
         imageLoading: true,
-        toManyRequest: false
+        toManyRequest: false,
+        pokemonUrl: '',
+        pokemonSlug: '',
+        totalOwned: 0
     };
 
     componentDidMount() {
         const { pokemon } = this.props
-        const pokemonIndex = pokemon.url.split('/')[pokemon.url.split('/').length -2]
-        const imageUrl = `https://github.com/PokeAPI/sprites/blob/master/sprites/pokemon/${pokemonIndex}.png?raw=true`
+        const pokemonIndex = pokemon.pokedexId ? pokemon.pokedexId : pokemon.url.split('/')[pokemon.url.split('/').length -2]
+        const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonIndex}.png?raw=true`
+        const pokemonUrl = pokemon.pokedexId ? `my-pokemon/${pokemon.slug}` : `pokemon/${pokemonIndex}`
+        const pokemonSlug = pokemon.pokedexId ? `my-pokemon/${pokemon.slug}` : null
+
+        if (!pokemon.pokedexId) {
+            this.props.onFetchPokemon();
+        }
+        const totalOwned = this.props.myPokemon.filter(p => parseInt(pokemonIndex) === p.pokedexId).length
+
 
         this.setState({
             name: pokemon.name,
             imageUrl,
-            pokemonIndex
+            pokemonIndex,
+            pokemonUrl,
+            pokemonSlug,
+            totalOwned
         })
     }
 
     render() {
         return (
-            <div className="col col-md-3 mb-5">
-                <StyledLink to={`pokemon/${this.state.pokemonIndex}`}>
+            <div className="col-12 col-md-3 mb-5">
+                <StyledLink to={this.state.pokemonUrl}>
                     <Card className="card">
                         <div className="card-header" style={{backgroundColor: "#E19720"}}>
-                            <h5>{this.state.pokemonIndex}</h5>
+
+                            <h5>{this.state.pokemonSlug ? '' : this.state.pokemonIndex}</h5>
                         </div>
                         {this.state.imageLoading ? (
                             <img src={pokeball} style={{width: '5em', height: '5em'}}
@@ -94,6 +112,11 @@ class PokemonCard extends Component {
                         <div className="card-body mx-auto">
                             <h6 className="card-title">{this.state.name.charAt(0).toUpperCase() + this.state.name.slice(1)}</h6>
                         </div>
+                        {!this.state.pokemonSlug && <div className="card-footer">
+                            <div className="row">
+                                <div className="col-12 text-right">Total owned: {this.state.totalOwned}</div>
+                            </div>
+                        </div>}
                     </Card>
                 </StyledLink>
             </div>
@@ -101,4 +124,4 @@ class PokemonCard extends Component {
     }
 }
 
-export default PokemonCard;
+export default connect(mapStateToProps, mapDispatchToProps)(PokemonCard);

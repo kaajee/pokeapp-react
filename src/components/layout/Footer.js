@@ -5,7 +5,7 @@ export default  class Footer extends Component {
     render() {
         return (
             <React.Fragment>
-                <footer className="footer">
+                <footer className="footer mt-4 pt-2 pb-2">
                     <div className="container">
                         <div>
                             Data From{' '}

@@ -1,12 +1,8 @@
 import React, {Component} from 'react';
-import { connect } from 'react-redux';
 import axios from "axios";
-
-import Modal from 'react-bootstrap/Modal'
-import Form from 'react-bootstrap/Form'
-import { mapDispatchToProps } from './actionCreators';
-import { mapStateToProps } from './selectors';
-import {stringToSlug} from "../../helpers";
+import {connect} from "react-redux";
+import {mapStateToProps} from "./selectors";
+import {mapDispatchToProps} from "./actionCreators";
 
 const TYPE_COLORS = {
     bug: 'B1C12E',
@@ -29,9 +25,10 @@ const TYPE_COLORS = {
     water: '3295F6'
 };
 
-class Pokemon extends Component {
+class MyPokemonDetail extends Component {
 
     state = {
+        pokemonSlug: '',
         name: '',
         imageUrl: '',
         pokemonIndex: '',
@@ -55,17 +52,13 @@ class Pokemon extends Component {
         genderRatioFemale: '',
         evs: '',
         hatchSteps: '',
-        pokemon: {},
-        // myPokemon: [],
-        modalShow: false,
-        isCaught: false,
-        caughtPokemonName: '',
-        isValid: true,
-        errorMessage: ''
+        pokemon: {}
     };
 
     async componentDidMount() {
-        const {pokemonIndex} = this.props.match.params;
+        const {pokemonSlug} = this.props.match.params;
+        const pokemonData = this.props.myPokemon.filter(p => pokemonSlug === p.slug)
+        const pokemonIndex = pokemonData[0].pokedexId
 
         const pokemonUrl = `https://pokeapi.co/api/v2/pokemon/${pokemonIndex}/`;
         const pokemonSpeciesUrl = `https://pokeapi.co/api/v2/pokemon-species/${pokemonIndex}/`;
@@ -73,7 +66,7 @@ class Pokemon extends Component {
         const pokemonRes = await axios.get(pokemonUrl);
 
         this.setState({
-            pokemon: pokemonRes.data
+            pokemon: pokemonData[0]
         })
         const name = pokemonRes.data.name;
         const imageUrl = pokemonRes.data.sprites.front_default;
@@ -193,80 +186,17 @@ class Pokemon extends Component {
             evs
         })
 
-        this.nameOnchange = this.nameOnchange.bind(this);
-        this.nameValidation = this.nameValidation.bind(this);
-        this.savePokemon = this.savePokemon.bind(this);
+        this.releasePokemon = this.releasePokemon.bind(this);
     }
 
-    catchPokemon = () => {
-        this.setState({
-            isCaught: Math.random() < 0.5
-        })
-        this.handleModalOpen()
+    goto = (pathname) => {
+        this.props.history.push(pathname);
     }
 
-    nameOnchange(event) {
-        this.setState({caughtPokemonName: event.target.value});
+    releasePokemon = () => {
+        this.props.onRemove(this.state.pokemon.name)
+        this.goto('/my-pokemon');
     }
-
-    nameValidation() {
-
-        if (this.props.myPokemon) {
-            const monExists = (this.props.myPokemon.filter(p => this.state.caughtPokemonName === p.name).length > 0)
-
-            if (this.state.caughtPokemonName == null || this.state.caughtPokemonName === "") {
-                this.setState({
-                    isValid: false,
-                    errorMessage: 'Please input name!'
-                })
-                return false
-            }
-
-            if (monExists) {
-                this.setState({
-                    isValid: false,
-                    errorMessage: 'Name already exist!'
-                })
-                return false
-            }
-        }
-
-        this.setState({
-            isValid: true,
-            errorMessage: ''
-        })
-        return true
-    }
-
-    savePokemon = (event) => {
-        event.preventDefault();
-        if (this.nameValidation() === false) {
-            event.stopPropagation();
-        } else {
-            const caughtPokemon = {
-                name: this.state.caughtPokemonName,
-                slug: stringToSlug(this.state.caughtPokemonName),
-                pokedexId: this.state.pokemon.id
-            }
-            this.props.onCatchPokemon(caughtPokemon);
-            this.setState(state => ({
-                modalShow: false,
-                caughtPokemonName: ''
-            }))
-        }
-    }
-
-    handleModalOpen = () => {
-        this.setState({
-            modalShow: true
-        })
-    };
-
-    handleModalClose = () => {
-        this.setState({
-            modalShow: false
-        })
-    };
 
     render() {
         return (
@@ -491,76 +421,23 @@ class Pokemon extends Component {
                             </div>
                         </div>
                         <div className="card-footer">
-
                             <button
                                 type="button"
-                                className="btn btn-lg btn-block"
+                                className="btn btn-block"
                                 style={{
                                     color: "#FFFFFF",
                                     backgroundColor: "#811E09"
                                 }}
-                                onClick={() => this.catchPokemon()}
+                                onClick={() => this.releasePokemon()}
                             >
-                                Catch!
+                                Release!
                             </button>
                         </div>
                     </div>
                 </div>
-                <Modal show={this.state.modalShow} onHide={this.handleModalClose} backdrop="static"
-                       keyboard={false} centered>
-                    <Modal.Header className="align-items-center" closeButton>
-                        <Modal.Title>
-                            {this.state.isCaught ? (<h6 className="mb-0">Catch Success</h6>) : (<h6 className="mb-0">Catch Failed</h6>)}
-                        </Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        {this.state.isCaught ? (
-                            <div>
-                                <p>Congratulations, you caught the {this.state.name}</p>
-                                <p>Give your pokemon a name</p>
-                                <Form noValidate onSubmit={this.savePokemon}>
-                                    <Form.Group controlId="pokemonName">
-                                        <Form.Label>Name:</Form.Label>
-                                        <Form.Control type="text"
-                                                      placeholder="Enter new name" onChange={this.nameOnchange}
-                                                      aria-describedby="validationNameFeedback"
-                                                      required/>
-                                        {!this.state.isValid && (
-                                            <Form.Control.Feedback type="invalid" style={{display: "block"}}>
-                                                {this.state.errorMessage}
-                                            </Form.Control.Feedback>)}
-                                    </Form.Group>
-                                    <input
-                                        className="btn btn-primary"
-                                        style={{
-                                            color: "#000000",
-                                            backgroundColor: "#1EDC00"
-                                        }}
-                                        type="submit"
-                                        value="Submit" />
-                                </Form>
-                            </div>
-                        ) : (
-                            <div>
-                                <p>Sorry, you failed to catch pokemon</p>
-                                <button
-                                    type="button"
-                                    className="btn btn-primary"
-                                    style={{
-                                        color: "#FFFFFF",
-                                        backgroundColor: "#811E09"
-                                    }}
-                                    onClick={() => this.handleModalClose()}
-                                >
-                                    Close
-                                </button>
-                            </div>
-                        )}
-                    </Modal.Body>
-                </Modal>
             </React.Fragment>
         );
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Pokemon);
+export default connect(mapStateToProps, mapDispatchToProps)(MyPokemonDetail);
