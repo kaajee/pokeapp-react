@@ -61,11 +61,15 @@ class PokemonCard extends Component {
         const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonIndex}.png?raw=true`
         const pokemonUrl = pokemon.pokedexId ? `my-pokemon/${pokemon.slug}` : `pokemon/${pokemonIndex}`
         const pokemonSlug = pokemon.pokedexId ? `my-pokemon/${pokemon.slug}` : null
-
+        
         if (!pokemon.pokedexId) {
-            this.props.onFetchPokemon();
+            const fetchLocalStorage = JSON.parse(localStorage.getItem("myPokemon")) || [];
+            const totalOwned = fetchLocalStorage.filter(p => parseInt(pokemonIndex) === p.pokedexId).length
+            this.setState({
+                totalOwned
+            })
         }
-        const totalOwned = this.props.myPokemon.filter(p => parseInt(pokemonIndex) === p.pokedexId).length
+
 
 
         this.setState({
@@ -73,8 +77,7 @@ class PokemonCard extends Component {
             imageUrl,
             pokemonIndex,
             pokemonUrl,
-            pokemonSlug,
-            totalOwned
+            pokemonSlug
         })
     }
 
